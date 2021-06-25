@@ -1,0 +1,21 @@
+Fitur-Fitur:
+- Login
+- Check in
+- Check out
+- Cari data customer
+- Ubah data customer
+
+Struktur data:
+1. Pemilik: nama lengkap, Alamat, no.telp.
+2. Hewan: No. kandang, jenis hewan, nama hewan, ras, jenis kelamin, umur, keterangan.
+3. Penitipan: Customer ID, tanggal check-in, lama menitipkan, Biaya inap.
+
+Pada fitur check-in:
+ambil input dari user berupa data pemilik dan data hewan, lama inap. simpan pada sebuah variabel
+bertipe Penitipan. Buat otomatis Cust ID, tanggal check-in, biaya inap. Simpan pada variabel tadi.
+Rekam data di file datainap.
+
+Pada fitur check-out:
+cari data cust id, simpan dan tampilkan data: cust id, nama pemilik, nama hewan, total biaya.
+Ambil input boolean apakah check-out sekarang?. Jika ya, salin semua data pada file settled.
+Hapus data dari file datainap.
