@@ -1,0 +1,4 @@
+Q8X7T3	Kucing	Simon	Persia	J	6	-
+L1T1R7	Anjing	Baffi	Golden Retriever	J	3	-
+L1T1R7	Anjing	Doge	Shiba Inu	J	4	-
+K2S4I8	Kucing	Bulet	Persia	B	4	-
