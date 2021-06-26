@@ -6,6 +6,7 @@
 #define LONGSTR 1000
 #define SHORTSTR 100
 #define MAXHEWAN 10
+#define BIAYAINAP 50000
 
 typedef struct
 {
@@ -14,6 +15,7 @@ typedef struct
     char nama[SHORTSTR];
     char ras[SHORTSTR];
     char kelamin[SHORTSTR];
+    int umur;
     char keterangan_lain[LONGSTR];
 } Hewan;
 
@@ -29,9 +31,18 @@ typedef struct
 {
     char id_cust[SHORTSTR];
     char tgl_checkin[SHORTSTR];
-    char durasi[SHORTSTR];
-    char total_biaya[SHORTSTR];
+    int durasi;
+    long int total_biaya;
 } DataPenitipan;
+
+FILE *fcust;
+FILE *fhewan;
+FILE *forder;
+
+void clearinputbuffer()
+{
+    while(getchar() != '\n');
+}
 
 void tampilkan_menu()
 {
@@ -45,12 +56,7 @@ void tampilkan_menu()
     printf("4. Ubah data\n");
 }
 
-void create_custID()
-{
-
-}
-
-void create_petID(char *petID)
+void create_ID(char *ID)
 {
     int i;
     //ascii number (48, 57)
@@ -59,19 +65,26 @@ void create_petID(char *petID)
     srand(time(NULL));
 
     //generate 3 random number
-    for (i = 1; i <= 3; ++i)
+    for (i = 1; i <= 6; ++i)
     {
-        petID[i-1] = ( rand() % (57 - 48 + 1) ) + 48; //random number 0-9
+        if (i % 2 == 0)
+            ID[i-1] = ( rand() % (57 - 48 + 1) ) + 48; //random number 0-9
+        else if(i % 2 != 0)
+            ID[i-1] = ( rand() % (90 - 65 + 1) ) + 65;
     }
+}
 
-    for (i = 4; i <= 6; ++i)
-    {
-        petID[i-1] = ( rand() % (90 - 65 + 1) ) + 65; //random uppercase alphabet 
-    }
+void get_date(char *tgl)
+{
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
 }
 
 void check_in()
 {
+    int i;
+    int jml_hewan;
+
     Owner customer;
     DataPenitipan order;
 
@@ -81,27 +94,75 @@ void check_in()
     printf("Data Owner\n");
     printf("-----------\n");
     printf("Nama Lengkap: ");
-    scanf("%s ", customer.nama_lengkap);
+    scanf("%[^\n]%*c", customer.nama_lengkap);
     printf("Alamat Rumah: ");
-    scanf("%s ", customer.alamat);
+    scanf("%[^\n]%*c", customer.alamat);
     printf("No Telp: ");
-    scanf("%s ", customer.no_telp);
+    scanf("%[^\n]%*c", customer.no_telp);
+    printf("Jumlah hewan yang dititipkan: ");
+    scanf("%d", &jml_hewan);
+    clearinputbuffer();
 
-    printf("Data Hewan\n");
-    printf("------------\n");
-    printf("Nama: ");
-    scanf("%s ", customer.hewan->nama);
-    printf("Jenis: ");
-    scanf("%s ", customer.hewan->jenis);
-    printf("Jenis Kelamin: ");
-    scanf("%s ", customer.hewan->kelamin);
-    printf("Jenis Ras: ");
-    scanf("%s ", customer.hewan->ras);
+    for (i = 1; i <= jml_hewan; ++i)
+    {
+        printf("Data Hewan %d\n", i);
+        printf("------------\n");
+        create_ID(customer.hewan[i-1].id_hewan);
+        printf("Nama: ");
+        scanf("%[^\n]%*c", customer.hewan[i-1].nama);
+        printf("Jenis: ");
+        scanf("%[^\n]%*c", customer.hewan[i-1].jenis);
+        printf("Jenis Kelamin: ");
+        scanf("%[^\n]%*c", customer.hewan[i-1].kelamin);
+        printf("Umur: ");
+        scanf("%d", &customer.hewan[i-1].umur);
+        clearinputbuffer();
+        printf("Jenis Ras: ");
+        scanf("%[^\n]%*c", customer.hewan[i-1].ras);
+        printf("Keterangan lain: ");
+        scanf("%[^\n]%*c", customer.hewan[i-1].keterangan_lain);
+
+        // Data penitipan
+        // ID Customer
+        create_ID(order.id_cust);
+        // tanggal check-in
+        get_date(order.tgl_checkin);
+        // lama penitipan
+        printf("Durasi Penitipan: ");
+        scanf("%d", &order.durasi);
+        clearinputbuffer();
+        // Hitung total biaya
+        order.total_biaya = order.durasi * BIAYAINAP;
+
+        // Rekam data ke file
+        // Rekam ke file customer
+        fcust = fopen("data\\customer.txt", "w");
+        if (fcust != NULL)
+        {
+            fprintf(fcust, "%s\t%s\t%s\n", &customer.nama_lengkap, &customer.alamat, &customer.no_telp);
+        }
+        else
+            printf("Error opening data file.");
+        fclose(fcust);
+        
+        // Rekam ke file hewan
+        fhewan = fopen("data\\hewan.txt", "w");
+        fprintf(fhewan, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+        customer.hewan[i-1].id_hewan, customer.hewan[i-1].jenis, customer.hewan[i-1].nama,
+        customer.hewan[i-1].ras, customer.hewan[i-1].kelamin, customer.hewan[i-1].umur, 
+        customer.hewan[i-1].keterangan_lain);
+        fclose(fhewan);
+        
+        // Rekam ke file order
+        forder = fopen("data\\order.txt", "w");
+        fprintf(forder, "%s\t%s\t%d\t%ld\n", order.id_cust, order.tgl_checkin, order.durasi,
+        order.total_biaya);
+    }
 }
 
 int main()
 {
-    char petID[6];
+    char *tgl;
     // char menu;
     // do
     // {
@@ -115,8 +176,8 @@ int main()
     //         break;
     //     }
     // } while (menu != 5);
-    create_petID(petID);
-    printf("%s \n", petID);
+
+    check_in();
     
     return 0;
 }
